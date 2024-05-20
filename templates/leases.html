@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>dhcpd leases</title>
+    </head>
+    <body>
+        <script>
+            const expandElements = shouldExpand => {
+                let detailsElements = document.querySelectorAll("details");
+                
+                detailsElements = [...detailsElements];
+
+                if (shouldExpand) {
+                    detailsElements.map(item => item.setAttribute("open", shouldExpand));
+                } else {
+                    detailsElements.map(item => item.removeAttribute("open"));
+                }
+            };
+        </script>
+
+        <button onClick="expandElements(true)">Expand all</button>
+        <button onClick="expandElements(false)">Collapse all</button>
+
+        {% for lease in leases %}
+        <details open>
+            <summary style="font-size: 20pt;">{{ lease.ip_addr }}</summary> 
+            <table style="margin-left:2em">
+                <tbody>
+                    {% match lease.hostname %}
+                        {% when Some with (name) %}
+                    <tr>
+                        <th align="right" scope="row">hostname</th>
+                        <th>:</th>
+                        <td align="left">{{ name }}</td>
+                    </tr>
+                        {% when None %}
+                    {% endmatch %}
+                    <tr>
+                        <th align="right" scope="row">hardware address</th>
+                        <th>:</th>
+                        <td align="left">{{ lease.hardware.addr }}</td>
+                    </tr>
+                    <tr>
+                        <th align="right" scope="row">start time</th>
+                        <th>:</th>
+                        <td align="left">{{ lease.starts }}</td>
+                    </tr>
+                    <tr>
+                        <th align="right" scope="row">end time</th>
+                        <th>:</th>
+                        <td align="left">{{ lease.ends }}</td>
+                    </tr>
+                    <tr>
+                        <th align="right" scope="row">binding state</th>
+                        <th>:</th>
+                        <td align="left">{{ lease.binding_state }}</td>
+                    </tr>
+                    {% for var in lease.variables %}
+                    <tr>
+                        <th align="right" scope="row">{{ var.key }}</th>
+                        <th>:</th>
+                        <td align="left">{{ var.val }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </details>
+        {% endfor %}
+    </body>
+</html>

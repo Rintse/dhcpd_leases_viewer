@@ -1,0 +1,39 @@
+#!/bin/sh
+
+# PROVIDE: dhcpd_viewer
+# REQUIRE: LOGIN DAEMON NETWORKING
+# KEYWORD: rust
+
+# Enable this script by adding:
+# dhcpd_viewer_enable="YES"
+# ... to /etc/rc.conf
+# rc_debug=yes
+
+. /etc/rc.subr
+name=dhcpd_viewer
+
+rcvar=dhcpd_viewer_enable
+load_rc_config ${name}
+
+: ${dhcpd_viewer_user:=root}
+: ${dhcpd_viewer_group:=root}
+
+# This is the tool init launches
+command="/usr/sbin/daemon"
+
+pidfile="/var/run/${name}/${name}.pid"
+
+task="/usr/local/bin/${name}"
+procname="${task}"
+
+command_args="-p ${pidfile} -T ${name} ${task}"
+
+start_precmd="start_precmd"
+start_precmd()
+{
+        if [ ! -e "/var/run/${name}" ] ; then
+                install -d -o ${dhcpd_viewer_user} -g ${dhcpd_viewer_group} /var/run/${name};
+        fi
+}
+
+run_rc_command "$1"
